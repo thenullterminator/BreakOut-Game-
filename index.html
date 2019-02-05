@@ -1,0 +1,223 @@
+<html>
+    <head>
+        <title>
+            Breakout!
+        </title>
+
+        <style>
+
+            body
+            {
+                margin:0;
+                padding:0;
+            }
+        
+        canvas{
+            background-color:gold;
+            position:relative;
+            left:115px;
+            top:50px;
+        }
+        
+        </style>
+
+    </head>
+    <body>
+
+        <!----------------------Frontend--------------------->
+        <canvas id="gameboard" height="900px" width="1700px" style="margin:0 auto;">
+            
+        </canvas>
+
+        <!----------------------Game Code--------------------->
+        <script >
+
+
+        var canvas=document.getElementById("gameboard");
+        var cotxt=canvas.getContext("2d");
+        var radius=30,start=0;
+        var pdheight=20,pdwidth=250;
+        var pdx=(canvas.width-pdwidth)/2,pdy=canvas.height-pdheight;
+        var x=canvas.width/2,y=canvas.height-radius-pdheight,dx=2,dy=2;
+        var rightpressed=false,leftpressed=false;
+        var timeout;var interval;
+        document.addEventListener("keydown",keyDownHandler);
+        document.addEventListener("keyup",keyUpHandler);
+           draw();
+
+        function ball(){
+                cotxt.beginPath();
+                cotxt.arc(x,y,radius,0,Math.PI*2);
+                cotxt.fillStyle="White";
+                cotxt.fill();
+                cotxt.closePath();
+        }
+        
+
+
+        function draw()
+        {
+
+                cotxt.clearRect(0,0,canvas.width,canvas.height);
+                ball();
+                paddle(10);
+                
+
+                if(start>0)
+                {
+                if(x+dx<radius||x+dx>canvas.width-radius)
+                dx=-dx;
+                if(y+dy<radius)
+                dy=-dy;
+                else if(y+dy>canvas.height-radius)
+                {
+                    if(x>pdx&&x<pdx+pdwidth)
+                    dy=-1.1*dy;
+                    else
+                    {
+                    alert("Game Over!");
+                    clearInterval(interval);
+                    }
+                }
+                if(rightpressed&&pdx<canvas.width-pdwidth)
+                pdx+=3;
+                else if(leftpressed&&pdx>0)
+                pdx-=3;
+                
+                x=x+dx;
+                y=y+dy;
+                }
+               
+                 }
+        
+        
+        
+
+        function rep()
+        {
+            interval=setInterval(draw,5);
+        }
+
+        function beforestart()
+        {
+                 if(rightpressed&&pdx<canvas.width-pdwidth)
+                {
+                    pdx+=10;
+                    x+=10;
+                }
+                else if(leftpressed&&pdx>0)
+                {
+                    pdx-=10;
+                    x-=10;
+                }
+                cotxt.clearRect(0,0,canvas.width,canvas.height);
+                ball();
+                paddle(10);
+                
+        }
+
+
+        function randomcolor()
+        {
+            var r=Math.floor(Math.random()*256);
+            var g=Math.floor(Math.random()*256);
+            var b=Math.floor(Math.random()*256);
+            
+            return 'rgb('+r+','+g+','+b+')';
+        }
+       
+        
+      
+        function paddle( borderradius) {
+            
+        cotxt.beginPath();
+        cotxt.moveTo(pdx + borderradius, pdy);
+        cotxt.lineTo(pdx + pdwidth - borderradius, pdy);
+        cotxt.quadraticCurveTo(pdx + pdwidth, pdy, pdx + pdwidth, pdy + borderradius);
+        cotxt.lineTo(pdx + pdwidth, pdy + pdheight - borderradius);
+        cotxt.quadraticCurveTo(pdx + pdwidth, pdy + pdheight, pdx + pdwidth - borderradius, pdy + pdheight);
+        cotxt.lineTo(pdx + borderradius, pdy + pdheight);
+        cotxt.quadraticCurveTo(pdx, pdy + pdheight, pdx, pdy + pdheight - borderradius);
+        cotxt.lineTo(pdx, pdy + borderradius);
+        cotxt.quadraticCurveTo(pdx, pdy, pdx + borderradius, pdy);
+        cotxt.fillStyle="black";
+        cotxt.fill();
+        cotxt.closePath();
+        }
+
+
+       
+        function keyDownHandler(e)
+        {
+            if(e.key=="ArrowRight"||e.key=="Right")
+            {
+            rightpressed=true;
+           if(start==0)
+           beforestart();
+            }
+            else if(e.key=="ArrowLeft"||e.key=="Left")
+            {
+            leftpressed=true;
+            if(start==0)
+            beforestart();
+            }
+
+          
+            
+        }
+
+        function keyUpHandler(e)
+        {
+            if(e.key=="ArrowRight"||e.key=="Right")
+            rightpressed=false;
+            else if(e.key=="ArrowLeft"||e.key=="Left")
+            leftpressed=false;
+
+           
+
+            if(e.keyCode==13)
+            {
+                start=1;
+                rep();
+            }
+
+            if(e.keyCode==32)
+            alert("Game Paused!");
+
+            if(e.keyCode==27)
+            reassign();   
+            
+            
+            
+            
+        }
+       
+        function reassign()
+        {
+            clearInterval(interval);
+            start=0;
+             pdx=(canvas.width-pdwidth)/2,pdy=canvas.height-pdheight;
+           x=canvas.width/2,y=canvas.height-radius-pdheight,dx=2,dy=2;
+       
+         rightpressed=false,leftpressed=false;
+         draw();
+        }
+                  
+        </script>
+
+
+        <!--------------------Game-Controls--------------------->
+        <!--
+            1. Left/Right Arrow key for navigation of paddle.
+            2. Enter key for start
+            3. Space Bar for pause/resume.
+            4. esc for a new game.
+        -->
+
+    </body>
+</html>
+
+
+
+
+
