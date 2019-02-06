@@ -35,7 +35,7 @@
 
         var canvas=document.getElementById("gameboard");
         var cotxt=canvas.getContext("2d");
-        var radius=30,start=0;
+        var radius=25,start=0;
         var pdheight=20,pdwidth=250;
         var pdx=(canvas.width-pdwidth)/2,pdy=canvas.height-pdheight;
         var x=canvas.width/2,y=canvas.height-radius-pdheight,dx=2,dy=2;
@@ -43,7 +43,40 @@
         var timeout;var interval;
         document.addEventListener("keydown",keyDownHandler);
         document.addEventListener("keyup",keyUpHandler);
-           draw();
+           
+
+
+
+        var brickRowCount = 7;
+        var brickColumnCount = 9;
+        var brickWidth = 171;
+        var brickHeight = 35;
+        var brickPadding = 13;
+        var brickOffsetTop = 30;
+        var brickOffsetLeft = 30;
+
+        var bricks = [];
+
+
+        for(var i=0;i<brickRowCount;i++)
+        {   
+            bricks[i]=[];
+            for(var j=0;j<brickColumnCount;j++)
+            {
+                bricks[i][j]={x:0,y:0};
+            }
+        }
+
+       
+           
+           
+           
+        drawBricks();
+        draw();
+
+
+
+
 
         function ball(){
                 cotxt.beginPath();
@@ -58,7 +91,9 @@
         function draw()
         {
 
+               
                 cotxt.clearRect(0,0,canvas.width,canvas.height);
+                drawBricks();
                 ball();
                 paddle(10);
                 
@@ -146,6 +181,25 @@
         }
 
 
+        function drawdimbricks(x, y, width, height, radius) 
+        {
+       
+            cotxt.beginPath();
+            cotxt.moveTo(x + radius, y);
+            cotxt.lineTo(x + width - radius, y);
+            cotxt.quadraticCurveTo(x + width, y, x + width, y + radius);
+            cotxt.lineTo(x + width, y + height - radius);
+            cotxt.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            cotxt.lineTo(x + radius, y + height);
+            cotxt.quadraticCurveTo(x, y + height, x, y + height - radius);
+            cotxt.lineTo(x, y + radius);
+            cotxt.quadraticCurveTo(x, y, x + radius, y);
+            cotxt.fillStyle="black";
+            cotxt.fill();
+            cotxt.closePath();
+              
+        }
+
        
         function keyDownHandler(e)
         {
@@ -202,6 +256,73 @@
          rightpressed=false,leftpressed=false;
          draw();
         }
+
+
+
+
+
+
+                
+               
+                function drawBricks() {
+                  
+                    var c=1;
+                  for(var i=0; i<brickRowCount; i++) {
+                      for(var j=0; j<brickColumnCount; j++) {
+                        
+                        
+                        var brickX = (j*(brickWidth+brickPadding))+brickOffsetLeft;
+                        var brickY = (i*(brickHeight+brickPadding))+brickOffsetTop;
+                        bricks[i][j].x = brickX;
+                        bricks[i][j].y = brickY;
+
+                        if(i<=3)
+                        drawdimbricks(brickX,brickY, brickWidth, brickHeight,10);
+                        else
+                        {
+                            if(j==0||j==brickColumnCount-1)
+                            drawdimbricks(brickX,brickY, brickWidth, brickHeight,10);
+                            else
+                            {
+                                    if((j>=i-2)&&(j<=10-i))
+                                    {
+                                    drawdimbricks(brickX,brickY, brickWidth, brickHeight,10);
+                                    c++;
+                                    }
+                                    else
+                                    continue;
+                            }
+                                
+                        }
+                     }
+                    }
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                   
         </script>
 
