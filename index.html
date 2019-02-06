@@ -32,10 +32,10 @@
         <!----------------------Game Code--------------------->
         <script >
 
-
+        
         var canvas=document.getElementById("gameboard");
         var cotxt=canvas.getContext("2d");
-        var radius=25,start=0;
+        var radius=22,start=0;
         var pdheight=20,pdwidth=250;
         var pdx=(canvas.width-pdwidth)/2,pdy=canvas.height-pdheight;
         var x=canvas.width/2,y=canvas.height-radius-pdheight,dx=2,dy=2;
@@ -45,14 +45,14 @@
         document.addEventListener("keyup",keyUpHandler);
            
 
-
-
+        var multi=false;
+        var count =0;
         var brickRowCount = 7;
         var brickColumnCount = 9;
         var brickWidth = 171;
         var brickHeight = 35;
         var brickPadding = 13;
-        var brickOffsetTop = 30;
+        var brickOffsetTop = 45;
         var brickOffsetLeft = 30;
 
         var bricks = [];
@@ -63,10 +63,24 @@
             bricks[i]=[];
             for(var j=0;j<brickColumnCount;j++)
             {
-                bricks[i][j]={x:0,y:0};
+                bricks[i][j]={x:0,y:0,vis:0};
+
+
+                        if(i<=3)
+                        bricks[i][j].vis=1;
+                        else
+                        {
+                            if(j==0||j==brickColumnCount-1)
+                            bricks[i][j].vis=1;
+                            else
+                            {
+                                    if((j>=i-2)&&(j<=10-i))
+                                    bricks[i][j].vis=1;
+                            }
+                                
+                        }
             }
         }
-
        
            
            
@@ -81,7 +95,7 @@
         function ball(){
                 cotxt.beginPath();
                 cotxt.arc(x,y,radius,0,Math.PI*2);
-                cotxt.fillStyle="White";
+                cotxt.fillStyle=randomcolor();
                 cotxt.fill();
                 cotxt.closePath();
         }
@@ -96,7 +110,8 @@
                 drawBricks();
                 ball();
                 paddle(10);
-                
+                collide();
+                displayscore();
 
                 if(start>0)
                 {
@@ -107,7 +122,10 @@
                 else if(y+dy>canvas.height-radius)
                 {
                     if(x>pdx&&x<pdx+pdwidth)
-                    dy=-1.1*dy;
+                    {
+                    dy=-(1.05+Math.random()/100.0)*dy;
+                    ball(randomcolor());
+                    }
                     else
                     {
                     alert("Game Over!");
@@ -148,12 +166,17 @@
                 cotxt.clearRect(0,0,canvas.width,canvas.height);
                 ball();
                 paddle(10);
+                collide();
+                displayscore();
+                drawBricks();
                 
         }
 
 
         function randomcolor()
         {
+            if(!multi)
+            return "white"
             var r=Math.floor(Math.random()*256);
             var g=Math.floor(Math.random()*256);
             var b=Math.floor(Math.random()*256);
@@ -163,7 +186,7 @@
        
         
       
-        function paddle( borderradius) {
+        function paddle(borderradius) {
             
         cotxt.beginPath();
         cotxt.moveTo(pdx + borderradius, pdy);
@@ -227,7 +250,15 @@
             else if(e.key=="ArrowLeft"||e.key=="Left")
             leftpressed=false;
 
-           
+            if(e.keyCode==77)
+            {
+                multi=true;
+            }
+            if(e.keyCode==87)
+            {
+                multi=false;
+            }
+
 
             if(e.keyCode==13)
             {
@@ -254,6 +285,31 @@
            x=canvas.width/2,y=canvas.height-radius-pdheight,dx=2,dy=2;
        
          rightpressed=false,leftpressed=false;
+            count=0;
+         for(var i=0;i<brickRowCount;i++)
+        {   
+            bricks[i]=[];
+            for(var j=0;j<brickColumnCount;j++)
+            {
+                bricks[i][j]={x:0,y:0,vis:0};
+
+
+                        if(i<=3)
+                        bricks[i][j].vis=1;
+                        else
+                        {
+                            if(j==0||j==brickColumnCount-1)
+                            bricks[i][j].vis=1;
+                            else
+                            {
+                                    if((j>=i-2)&&(j<=10-i))
+                                    bricks[i][j].vis=1;
+                            }
+                                
+                        }
+            }
+        }
+
          draw();
         }
 
@@ -264,62 +320,72 @@
 
                 
                
-                function drawBricks() {
+                function drawBricks() 
+                {
                   
-                    var c=1;
-                  for(var i=0; i<brickRowCount; i++) {
-                      for(var j=0; j<brickColumnCount; j++) {
-                        
-                        
+                  var c=1;
+                  for(var i=0; i<brickRowCount; i++) 
+                  {
+                      for(var j=0; j<brickColumnCount; j++) 
+                      {
+                                                
                         var brickX = (j*(brickWidth+brickPadding))+brickOffsetLeft;
                         var brickY = (i*(brickHeight+brickPadding))+brickOffsetTop;
                         bricks[i][j].x = brickX;
                         bricks[i][j].y = brickY;
 
-                        if(i<=3)
-                        drawdimbricks(brickX,brickY, brickWidth, brickHeight,10);
-                        else
+                        if(bricks[i][j].vis==1)
                         {
-                            if(j==0||j==brickColumnCount-1)
+                            bricks[i][j].x = brickX;
+                            bricks[i][j].y = brickY;
                             drawdimbricks(brickX,brickY, brickWidth, brickHeight,10);
-                            else
-                            {
-                                    if((j>=i-2)&&(j<=10-i))
-                                    {
-                                    drawdimbricks(brickX,brickY, brickWidth, brickHeight,10);
-                                    c++;
-                                    }
-                                    else
-                                    continue;
-                            }
-                                
                         }
+
                      }
                     }
+                }
+
+
+                function collide()
+                {
+                    
+                    for(var i=0;i<brickRowCount;i++)
+                    {
+                        for(var j=0;j<brickColumnCount;j++)
+                        {
+                            if(bricks[i][j].vis==1)
+                            {
+                                if(((x>bricks[i][j].x)&&(x<(bricks[i][j].x+brickWidth)))&&((y>bricks[i][j].y)&&(y<(bricks[i][j].y+brickHeight))))
+                                {
+                                    bricks[i][j].vis=0;
+                                    count++;
+                                    dy=-dy;
+                                }
+                            }
+                        }
                     }
 
+                    if(count==51)
+                    {
+                    count=0;
+                    cotxt.clearRect(0,0,canvas.width,canvas.height);
+                    setTimeout(won,20);
+                    
+                    }
+                }
 
+                function won()
+                {
+                    alert("Congratulations! You won the Game");
+                    reassign();
+                }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                function displayscore()
+                {
+                    cotxt.font = "26px Arial";
+                    cotxt.fillStyle = "black";
+                    cotxt.fillText("Score: "+count, 20, 35);
+                }
 
 
 
@@ -333,6 +399,8 @@
             2. Enter key for start
             3. Space Bar for pause/resume.
             4. esc for a new game.
+            5. W for white ball.
+            6. M for multicolor ball.
         -->
 
     </body>
