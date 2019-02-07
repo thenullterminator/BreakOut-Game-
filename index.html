@@ -13,7 +13,7 @@
             }
         
         canvas{
-            background-color:gold;
+            background:goldenrod;
             position:relative;
             left:115px;
             top:50px;
@@ -25,6 +25,7 @@
     <body>
 
         <!----------------------Frontend--------------------->
+     
         <canvas id="gameboard" height="900px" width="1700px" style="margin:0 auto;">
             
         </canvas>
@@ -32,6 +33,7 @@
         <!----------------------Game Code--------------------->
         <script >
 
+       
         
         var canvas=document.getElementById("gameboard");
         var cotxt=canvas.getContext("2d");
@@ -54,9 +56,12 @@
         var brickPadding = 13;
         var brickOffsetTop = 45;
         var brickOffsetLeft = 30;
-
+        var life=3;
         var bricks = [];
 
+
+
+            
 
         for(var i=0;i<brickRowCount;i++)
         {   
@@ -83,6 +88,10 @@
         }
        
            
+      
+
+
+
            
            
         drawBricks();
@@ -101,6 +110,31 @@
         }
         
 
+        function lives()
+            {
+
+                cotxt.font = "26px Arial";
+                cotxt.fillStyle = "white";
+                cotxt.fillText("Lives: ", 1450+50+20, 33);
+                var imgx=1600;
+
+               
+                    var  base_image = new Image();
+                    base_image.src = 'heart_2_5.png';
+                    
+
+                    base_image.onload=function(){
+                    for(var i=0;i<life;i++)
+                    {
+                    cotxt.drawImage(base_image,imgx, 13,20,20);
+                    imgx+=25;
+                     }  
+                    }
+            }
+
+
+
+
 
         function draw()
         {
@@ -112,6 +146,7 @@
                 paddle(10);
                 collide();
                 displayscore();
+                lives();
 
                 if(start>0)
                 {
@@ -128,8 +163,19 @@
                     }
                     else
                     {
+                     if(life==1)
+                     {
                     alert("Game Over!");
                     clearInterval(interval);
+                    life--;
+                   // cotxt.clearRect(0,0,canvas.width,canvas.height);
+
+                     }
+                    else
+                    {
+                        life--;
+                        newlife();
+                    }
                     }
                 }
                 if(rightpressed&&pdx<canvas.width-pdwidth)
@@ -169,6 +215,7 @@
                 collide();
                 displayscore();
                 drawBricks();
+                lives();
                 
         }
 
@@ -198,7 +245,7 @@
         cotxt.quadraticCurveTo(pdx, pdy + pdheight, pdx, pdy + pdheight - borderradius);
         cotxt.lineTo(pdx, pdy + borderradius);
         cotxt.quadraticCurveTo(pdx, pdy, pdx + borderradius, pdy);
-        cotxt.fillStyle="black";
+        cotxt.fillStyle="white";
         cotxt.fill();
         cotxt.closePath();
         }
@@ -217,7 +264,7 @@
             cotxt.quadraticCurveTo(x, y + height, x, y + height - radius);
             cotxt.lineTo(x, y + radius);
             cotxt.quadraticCurveTo(x, y, x + radius, y);
-            cotxt.fillStyle="black";
+            cotxt.fillStyle="white";
             cotxt.fill();
             cotxt.closePath();
               
@@ -262,8 +309,16 @@
 
             if(e.keyCode==13)
             {
-                start=1;
+                if(start==0)
+                {
                 rep();
+                start=1;
+                }
+                else
+                {
+                    dx*=1.1;
+                    dy*=1.1;
+                }
             }
 
             if(e.keyCode==32)
@@ -272,15 +327,32 @@
             if(e.keyCode==27)
             reassign();   
             
-            
+            if(e.keyCode==8)
+            {
+                dx/=1.1;
+                dy/=1.1;
+            }
             
             
         }
+
+
+
+        function newlife()
+        {
+            clearInterval(interval);
+            start=0;
+            pdx=(canvas.width-pdwidth)/2,pdy=canvas.height-pdheight;
+           x=canvas.width/2,y=canvas.height-radius-pdheight,dx=2,dy=2;
+           rightpressed=false,leftpressed=false;
+           draw();
+        }
+
        
         function reassign()
         {
             clearInterval(interval);
-            start=0;
+            start=0;dx=2;dy=2;life=3;
              pdx=(canvas.width-pdwidth)/2,pdy=canvas.height-pdheight;
            x=canvas.width/2,y=canvas.height-radius-pdheight,dx=2,dy=2;
        
@@ -313,13 +385,6 @@
          draw();
         }
 
-
-
-
-
-
-                
-               
                 function drawBricks() 
                 {
                   
@@ -383,7 +448,7 @@
                 function displayscore()
                 {
                     cotxt.font = "26px Arial";
-                    cotxt.fillStyle = "black";
+                    cotxt.fillStyle = "white";
                     cotxt.fillText("Score: "+count, 20, 35);
                 }
 
@@ -396,11 +461,12 @@
         <!--------------------Game-Controls--------------------->
         <!--
             1. Left/Right Arrow key for navigation of paddle.
-            2. Enter key for start
+            2. Enter key for start and increasing speed of ball.
             3. Space Bar for pause/resume.
             4. esc for a new game.
             5. W for white ball.
             6. M for multicolor ball.
+            7.backspace to decrease speed of ball.
         -->
 
     </body>
